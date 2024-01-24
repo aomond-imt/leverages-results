@@ -9,17 +9,18 @@ import yaml
 import csv
 
 STRESS_CONSO = 1.358
-columns = ["net_tplgy", "srv_tplgy", "rn_type", "leverage", "size", "res"]
+columns = ["leverage", "n_obs", "n_hops", "n_deps", "res"]
 memory = Memory("/tmp", verbose=0)
 
 
-@memory.cache
+# @memory.cache
 def get_df():
     results_dir = "simulation_metrics"
     esds_results = []
     for expe_dir in os.listdir(results_dir):
         rel_expe_dir = f"{results_dir}/{expe_dir}"
-        net_tplgy, srv_tplgy, rn_type, leverage, size = expe_dir.split("-")
+        leverage, n_obs, n_hops, n_deps = expe_dir.split("-")
+        size = int(n_obs)*int(n_hops) + 1
         results_runs = {
             "comms": [],
             "time": [],
@@ -71,12 +72,8 @@ def get_df():
         }
 
         esds_results.append(
-            (net_tplgy, srv_tplgy, rn_type, leverage, int(size), np_results)
+            (leverage, n_obs, n_hops, n_deps, np_results)
         )
-        if net_tplgy in ["clique", "ring"]:
-            esds_results.append(
-                (net_tplgy, "nonfav", rn_type, leverage, int(size), np_results)
-            )
 
     return pd.DataFrame(
         esds_results,
@@ -116,28 +113,22 @@ def p(gb, energy_type):
     list_gb = copy.deepcopy(columns)
     list_gb.remove("res")
     list_gb.remove(gb)
-    list_gb = ["rn_type"]
+    list_gb = ["leverage"]
     df = get_df()
 
     df_gb = [*df.groupby(list_gb)]
     for key, pandas_vals in df_gb:
-        vals_to_print = filter(lambda el: el[0] not in ["starchain", "tree"], pandas_vals.values)
-        results = sorted(vals_to_print, key=lambda el: (el[3], rn.index(el[2]), net.index(el[0]), srv.index(el[1])))
-        for res in results:
-            net_tply, srv_tplgy, rn_type, leverage, size, values = res
+        for res in pandas_vals.values:
+            leverage, n_obs, n_hops, n_deps, np_results = res
             div = unit[energy_type]
-            rn_pos = rn_conv[rn_type][srv_tplgy]
-            index = indexes.index((srv_tplgy, net_tply))
-            index_rn = indexes_rn.index((rn_pos, srv_tplgy))
             csvwriter.writerow([
-                net_tply,
-                size,
-                f"{values[energy_type]['mean'] / div:.2f}",
-                f"{values[energy_type]['std'] / div:.2f}",
-                srv_conv[srv_tplgy],
-                rn_pos,
+                f"{np_results[energy_type]['mean'] / div:.2f}",
+                f"{np_results[energy_type]['std'] / div:.2f}",
                 leverage,
-                index
+                n_obs,
+                n_hops,
+                n_deps,
+                0
             ])
 
 
@@ -146,7 +137,7 @@ if __name__ == "__main__":
         csvfile_name = f"e_{energy_type}.csv"
         csvfile = open(csvfile_name, "w")
         csvwriter = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
-        csvwriter.writerow(["net_tplgy", "size", "energy_mean", "energy_std", "srv_tplgy", "rn_type", "leverage", "srv_tplgy_index"])
-        p("size", energy_type)
+        csvwriter.writerow(["energy_mean", "energy_std", "leverage", "n_obs", "n_hops", "n_deps", "srv_tplgy_index"])
+        p("n_obs", energy_type)
         csvfile.close()
         print(f"csv: {csvfile_name}")

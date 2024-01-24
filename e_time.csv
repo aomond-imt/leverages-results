@@ -1,3 +1,25 @@
-net_tplgy,size,energy_mean,energy_std,srv_tplgy,rn_type,leverage,srv_tplgy_index
-chain,3,58.07,0.00,worst,No RN,pull,9
-chain,3,58.07,0.00,worst,No RN,push,9
+energy_mean,energy_std,leverage,n_obs,n_hops,n_deps,srv_tplgy_index
+26.07,0.00,pull,1,1,4,0
+26.06,0.00,pull,1,1,2,0
+26.07,0.00,pull,1,1,3,0
+157.93,0.00,pull,1,2,3,0
+58.07,0.00,pull,1,2,1,0
+314.33,0.00,pull,1,2,4,0
+477.04,0.00,pull,1,3,3,0
+314.33,0.00,pull,1,3,2,0
+114.35,0.00,pull,1,3,1,0
+621.32,0.00,pull,1,3,4,0
+26.06,0.00,pull,1,1,1,0
+114.13,0.00,pull,1,2,2,0
+26.32,0.00,push,1,2,1,0
+26.32,0.00,push,1,2,3,0
+26.32,0.00,push,1,2,2,0
+26.67,0.00,push,1,3,2,0
+26.07,0.00,push,1,1,4,0
+26.06,0.00,push,1,1,3,0
+26.32,0.00,push,1,2,4,0
+26.67,0.00,push,1,3,4,0
+26.67,0.00,push,1,3,1,0
+26.06,0.00,push,1,1,1,0
+26.06,0.00,push,1,1,2,0
+26.67,0.00,push,1,3,3,0
