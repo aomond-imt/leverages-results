@@ -2,7 +2,7 @@ library("ggplot2")
 library("dplyr")
 
 obs <- 1
-hops <- 3
+hops <- 1
 for (e_type in c("dynamic", "total")) {
     d <- read.csv(glue::glue("e_{e_type}.csv"))
     d<-d %>% filter(n_obs == obs)
@@ -14,7 +14,7 @@ for (e_type in c("dynamic", "total")) {
     else {
         color <- function(){scale_fill_manual(values = c("#b1c470", "#8370c4", "#FC4E07"))}
     }
-    ggplot(d, aes(x=reorder(n_deps, srv_tplgy_index), y=energy_mean, fill=leverage, label=sprintf("%0.2f", energy_mean))) +
+    ggplot(d, aes(x=reorder(n_deps, srv_tplgy_index), y=energy_mean, fill=type_comms, label=sprintf("%0.2f", energy_mean))) +
         geom_bar(color="black", stat = "identity", position = "dodge") +
         geom_errorbar(position=position_dodge(0.9), aes(ymin=energy_mean - energy_std, ymax=energy_mean + energy_std), width=.2, linewidth=1) +
         geom_text(aes(y=min(energy_mean)/2), fontface="bold", position=position_dodge(width=0.9)) +
