@@ -9,7 +9,7 @@ import yaml
 import csv
 
 STRESS_CONSO = 1.358
-columns = ["type_comms", "n_obs", "n_hops", "n_deps", "res"]
+columns = ["type_comms", "n_obs", "n_hops", "n_deps", "data_size", "res"]
 memory = Memory("/tmp", verbose=0)
 
 
@@ -19,7 +19,7 @@ def get_df():
     esds_results = []
     for expe_dir in os.listdir(results_dir):
         rel_expe_dir = f"{results_dir}/{expe_dir}"
-        type_comms, n_obs, n_hops, n_deps = expe_dir.split("-")
+        type_comms, n_obs, n_hops, n_deps, data_size = expe_dir.split("-")
         size = int(n_obs)*int(n_hops) + 1
         results_runs = {
             "comms": [],
@@ -72,7 +72,7 @@ def get_df():
         }
 
         esds_results.append(
-            (type_comms, n_obs, n_hops, n_deps, np_results)
+            (type_comms, n_obs, n_hops, n_deps, data_size, np_results)
         )
 
     return pd.DataFrame(
@@ -119,7 +119,7 @@ def p(gb, energy_type):
     df_gb = [*df.groupby(list_gb)]
     for key, pandas_vals in df_gb:
         for res in pandas_vals.values:
-            type_comms, n_obs, n_hops, n_deps, np_results = res
+            type_comms, n_obs, n_hops, n_deps, data_size, np_results = res
             div = unit[energy_type]
             csvwriter.writerow([
                 f"{np_results[energy_type]['mean'] / div:.2f}",
@@ -128,6 +128,7 @@ def p(gb, energy_type):
                 n_obs,
                 n_hops,
                 n_deps,
+                data_size,
                 0
             ])
 
@@ -137,7 +138,7 @@ if __name__ == "__main__":
         csvfile_name = f"e_{energy_type}.csv"
         csvfile = open(csvfile_name, "w")
         csvwriter = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
-        csvwriter.writerow(["energy_mean", "energy_std", "type_comms", "n_obs", "n_hops", "n_deps", "srv_tplgy_index"])
+        csvwriter.writerow(["energy_mean", "energy_std", "type_comms", "n_obs", "n_hops", "n_deps", "data_size", "srv_tplgy_index"])
         p("n_obs", energy_type)
         csvfile.close()
         print(f"csv: {csvfile_name}")
